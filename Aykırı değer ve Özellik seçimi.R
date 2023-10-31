@@ -1,7 +1,5 @@
 #AYKIRI DEGERLER
-
 #DIABET DATA SET CLASSIFICATION ALGORITHM
-
 
 library(GEOquery)
 gds=getGEO("GDS1926")
@@ -17,26 +15,25 @@ order(outlier(aykiri),decreasing = TRUE)[1:5]
 
 
 ############################################################################################################################################################################################################
-
 #PARKINSON DATA SET PCOUT ALGORITHM
 #Aykiri deger tespiti icin pcout algoritmasi kullanilir. Bunun icin mvoutlier paketi kurulur.
 
 library(GEOquery)
 gds=getGEO("GDS3750")
-eset=GDS2eSet(gds,do.log2=TRUE)#Veri kumesinin expressionset nesnesine d�n��t�r�lmesi
+eset=GDS2eSet(gds,do.log2=TRUE)#Veri kumesinin expressionset nesnesine donusturulmesi
 veri=exprs(eset)
 veri[1:5,1:4]
 
 library(mvoutlier)
-veri=t(data.frame(veri))#Verinin transpose�unu almak i�in kullan�l�r.
-sonuc = pcout(veri,makeplot = TRUE) #Fonksiyon �al��t���nda grafik �izdirmek i�in
-order(sonuc$x.dist1,decreasing = TRUE) #Ayk�r� de�erleri g�rmek i�in
+veri=t(data.frame(veri))#Verinin transpose'unu almada kullanilir.
+sonuc = pcout(veri,makeplot = TRUE) 
+order(sonuc$x.dist1,decreasing = TRUE) #Aykiri deger gormek icin
 
 ############################################################################################################################################################################################################
 
-#COPA AYKIRI DE�ER ANAL�Z�
-#f�zyona u�ram�� gen �iftlerini bulmada copa() kullan�l�r 
-#plotcopa gen �iftleri i�in grafik olu�turur
+#COPA AYKIRI DEGER ANALIZI
+#fuzyona ugramis gen ciftlerini bulmada copa() kullanilir 
+#plotcopa gen ciftleri icin grafik olusturur
 
 library(GEOquery)
 library(copa)
@@ -57,7 +54,6 @@ tableCopa(sonuc)
 summaryCopa(sonuc,7)
 
 ############################################################################################################################################################################################################
-
 #LOF ALGORITHM ALMAN MEME KANSERI
 
 library(pec)
@@ -78,17 +74,11 @@ aykirideger=lofactor(veri,k=10)#aykiri deger nesnesine ait yogunluklar grafigi p
 
 plot(density(aykirideger))
 
-# En buyuk deger ureten 5 skor gosterilir
-
 aykiri=order(aykirideger,decreasing = T)[1:5]
 show(aykiri) #satir numaralarini ortaya koyar
 
-# Aykiri verileri gosterir
 veri[aykiri]
 
-#rep ifadeyi isteyen sayida tekrar etmek icin for dongusu gibi calisir
-
-#Grafik uzerinde normal degeri . ile aykiri deger * ile gosterilir
 
 n=nrow(veri)
 nokta=rep(".",n)
@@ -100,9 +90,7 @@ veri=veri[-aykiri,]
 
 
 ############################################################################################################################################################################################################
-
 #OZELLIK SECIMI
-
 #CANCERDATA BILGI KAZANCI ALGORITMASI
 
 
@@ -111,48 +99,44 @@ download.file("https://cancerdata.org/system/files/publications/Jochems-2017-Maa
 
 
 veri=read.table(unz(temp,"Jochems-2017-MaastroDataUnbinned.csv"),sep=";", header=TRUE)
-#Ge�ici dizindeki s�k��t�r�lm�� dosyan�n okunmas� i�in a��lmas� gerekir bu da unz() ile yap�l�r.
-unlink(temp)#dosya okunduktan sonra olu�an ge�cici diizni yok etmek i�in
+unlink(temp)
 
-str(veri,give.head=FALSE)#Veri k�mesinde hangi �zneiteliklerin oldu�unu g�rmek i�in ba�l�ks�z g�r�nt�lenir
+str(veri,give.head=FALSE)
 
-#i�erisinde NA olan de�erleri silme
 veri=veri[,-20]
 veri=veri[,-22]
 veri=veri[,-23]
 
-durum=as.factor(veri$Death_status)#s�n�f de�i�keni olarak se�iyoruz
+durum=as.factor(veri$Death_status)
 head(durum)
 
-library(FSelector)#r dilinde �zellik se�imi fselector ile ger�ekle�ir
+library(FSelector)
 library(GEOquery)
 
-onem=information.gain(durum~.,veri)#information gain ile �zellik se�imi �zelliklerine ula��l�r. Durum etiketi d���nda demek
+onem=information.gain(durum~.,veri)
 onem[order(-onem),1,drop=FALSE]
 
 
-subset=cutoff.k(onem,5)#�nemli g�rd���n 5ini ��kar
+subset=cutoff.k(onem,5)
 oznitelik=as.simple.formula(subset,"Durum")
-print(oznitelik)#sadece bu verilerle model olu�turulabilir
+print(oznitelik)
 
 ############################################################################################################################################################################################################
-
-#MELONOM� VER� �ST�NDE �ZELL�K SE��M�
+#MELONOMI VERI USTUNDE OZELLIK SECIMI
 
 library(GEOquery)
 gds=getGEO("GDS1926")
-eset=GDS2eSet(gds,do.log2 = TRUE)#expressionset bunun �zelli�i olan genefilter �znitelik se�imini g�relim
-library(genefilter)#geneFilter kullan�larak �znitelik se�imi
+eset=GDS2eSet(gds,do.log2 = TRUE)
+library(genefilter)
 dim(eset)
 veri=exprs(eset)
 veri[1:5,1:5]
-filtrele=varFilter(eset,var.cutoff=0.9)#%10 hesaplar
+filtrele=varFilter(eset,var.cutoff=0.9)#%10
 dim(filtrele)
 
 
 ############################################################################################################################################################################################################
-
-#ANOTASYON APKET� CMA KULLANILARAK �ZELL� SE��M�
+#ANOTASYON PAKETI CMA KULLANILARAK OZELLIK SECIMI
 
 library(GEOquery)
 okunan=getGEO("GDS3750")
@@ -161,13 +145,12 @@ eset=okunan[[1]]
 veri=as.matrix(t(exprs(eset)))
 colnames(pData(eset))
 
-durum=pData(eset)$agent#�apraz do�rulama
+durum=pData(eset)$agent
 library(CMA)
 library(randomForest)
 
-set.seed(111)#�retilecek test verisini sabitlemek i�in
+set.seed(111)
 
 ogrenme=GenerateLearningsets(y=durum,method=c("CV"),fold=2,strat = TRUE)
-#�apraz do�rulama i�lemi i�in yukar�daki fonksiyon kullan�l�r
 
 secim=GeneSelection(veri,durum,learningsets=ogrenme,method="rf")
